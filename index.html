@@ -1,0 +1,732 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.2">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1">&lt;meta charset="UTF-8" /&gt;</p>
+<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;</p>
+<p class="p1">&lt;title&gt;NYC Rat Sightings Analytics Dashboard (2010–2018)&lt;/title&gt;</p>
+<p class="p1">&lt;script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" /&gt;</p>
+<p class="p1">&lt;script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>:root {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--bg-primary: #0d1117;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--bg-secondary: #161b22;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--bg-tertiary: #21262d;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--border-color: #30363d;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--text-primary: #f0f6fc;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--text-secondary: #8b949e;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--accent: #58a6ff;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--accent-hover: #79c0ff;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--success: #3fb950;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--warning: #d29922;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--danger: #f85149;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>* { box-sizing: border-box; margin: 0; padding: 0; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background-color: var(--bg-primary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>color: var(--text-primary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>line-height: 1.5;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>header {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background-color: var(--bg-secondary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border-bottom: 1px solid var(--border-color);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 1.25rem 2rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>flex-wrap: wrap;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>justify-content: space-between;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>gap: 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.header-title h1 { font-size: 1.4rem; font-weight: 600; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.header-title p { color: var(--text-secondary); font-size: 0.875rem; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.filter-bar { display: flex; align-items: center; gap: 0.75rem; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.filter-bar label { font-size: 0.875rem; color: var(--text-secondary); font-weight: 500; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>select {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background-color: var(--bg-tertiary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>color: var(--text-primary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border: 1px solid var(--border-color);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border-radius: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 0.5rem 0.9rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-size: 0.9rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>outline: none;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>select:hover, select:focus { border-color: var(--accent); }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.tabs {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background-color: var(--bg-secondary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 0 2rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border-bottom: 1px solid var(--border-color);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>gap: 0.5rem;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.tab-btn {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background: none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>color: var(--text-secondary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 0.85rem 1.25rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-size: 0.95rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-weight: 500;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border-bottom: 2px solid transparent;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>transition: all 0.15s ease;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.tab-btn:hover { color: var(--text-primary); }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>main { max-width: 1400px; margin: 0 auto; padding: 1.75rem 2rem; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.tab-panel { display: none; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.tab-panel.active { display: block; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.kpi-grid {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>gap: 1.25rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>margin-bottom: 1.75rem;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.kpi-card {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background-color: var(--bg-secondary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border: 1px solid var(--border-color);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 1.25rem 1.5rem;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.kpi-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.kpi-value { font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: var(--text-primary); }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.kpi-sub { font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.charts-grid {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>gap: 1.5rem;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.card {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background-color: var(--bg-secondary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border: 1px solid var(--border-color);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 1.5rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>margin-bottom: 1.5rem;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.card-header {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>justify-content: space-between;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>flex-wrap: wrap;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>gap: 0.75rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>margin-bottom: 1.1rem;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.card-title { font-size: 1.05rem; font-weight: 600; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.badge {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background-color: var(--bg-tertiary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border: 1px solid var(--border-color);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 0.3rem 0.75rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border-radius: 999px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-size: 0.82rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>color: var(--accent);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-weight: 500;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.chart-container { position: relative; height: 340px; width: 100%; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.heatmap-wrapper { overflow-x: auto; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>table.heatmap { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: center; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>table.heatmap th, table.heatmap td {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 0.6rem 0.5rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border: 1px solid var(--border-color);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>table.heatmap th { background-color: var(--bg-tertiary); color: var(--text-secondary); font-weight: 600; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>table.heatmap td.month-col { text-align: left; font-weight: 600; background-color: var(--bg-secondary); color: var(--text-primary); }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.map-controls { display: flex; gap: 0.75rem; align-items: center; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.btn {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background-color: var(--bg-tertiary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>color: var(--text-primary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border: 1px solid var(--border-color);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border-radius: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 0.45rem 0.95rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-size: 0.875rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-weight: 500;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>transition: 0.15s;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.btn:hover { border-color: var(--accent); }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.btn.active { background-color: var(--accent); color: #0d1117; border-color: var(--accent); font-weight: 600; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>#nyc-map { height: 540px; width: 100%; border-radius: 8px; border: 1px solid var(--border-color); background: #0b0e14; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.legend {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background: rgba(22, 27, 34, 0.92);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border: 1px solid var(--border-color);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 0.75rem 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border-radius: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>color: var(--text-primary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-size: 0.8rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>line-height: 1.6;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.legend-item { display: flex; align-items: center; gap: 0.5rem; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.legend-swatch { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }</p>
+<p class="p1">&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;header&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="header-title"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;NYC DOHMH Rat Sightings Dashboard&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p&gt;311 Rodent Complaint Analytics &amp; Spatial Distribution (2010–2018)&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="filter-bar"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;label for="boroughFilter"&gt;Borough Filter:&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;select id="boroughFilter"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;option value="ALL"&gt;All Boroughs&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;option value="BROOKLYN"&gt;Brooklyn&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;option value="MANHATTAN"&gt;Manhattan&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;option value="QUEENS"&gt;Queens&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;option value="BRONX"&gt;Bronx&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;option value="STATEN ISLAND"&gt;Staten Island&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1">&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;nav class="tabs"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;button class="tab-btn active" data-tab="summary"&gt;Summary&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;button class="tab-btn" data-tab="trends"&gt;Monthly Trends&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;button class="tab-btn" data-tab="map"&gt;Interactive Map&lt;/button&gt;</p>
+<p class="p1">&lt;/nav&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;main&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- TAB 1: SUMMARY --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;section id="summary" class="tab-panel active"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="kpi-grid"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="kpi-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-label"&gt;Total Sightings&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-value" id="kpi-total"&gt;—&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-sub" id="kpi-total-sub"&gt;Filtered 311 complaints&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="kpi-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-label"&gt;Most Affected Borough&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-value" id="kpi-top-borough"&gt;—&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-sub" id="kpi-top-borough-sub"&gt;Highest share of sightings&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="kpi-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-label"&gt;Percentage of Cases Closed&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-value" id="kpi-closed-pct"&gt;—&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-sub" id="kpi-closed-sub"&gt;Closed vs. Pending/Assigned&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="kpi-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-label"&gt;Avg. Days to Resolve&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-value" id="kpi-avg-days"&gt;—&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-sub"&gt;Created Date to Closed Date&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="charts-grid"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="card-header"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="card-title"&gt;Total Sightings by Borough&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="chart-container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;canvas id="boroughBarChart"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="card-header"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="card-title"&gt;Sightings by Location Type&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="chart-container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;canvas id="locationDonutChart"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- TAB 2: MONTHLY TRENDS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;section id="trends" class="tab-panel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="card-header"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="card-title"&gt;Monthly Sightings (2010–2018) &amp; 12-Month Linear Regression Forecast&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="badge" id="trend-badge"&gt;Calculating trend...&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="chart-container" style="height: 380px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;canvas id="monthlyLineChart"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="card-header"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="card-title"&gt;Seasonal Heatmap (Month × Year)&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span style="font-size: 0.82rem; color: var(--text-secondary);"&gt;Light = Low Volume &amp;nbsp;|&amp;nbsp; Dark = Peak Volume&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="heatmap-wrapper" id="heatmapContainer"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- TAB 3: INTERACTIVE MAP --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;section id="map" class="tab-panel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="card-header"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="card-title"&gt;NYC Spatial Sighting Explorer&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="map-controls"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="btn active" id="btnZipView"&gt;Zip Code View&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="btn" id="btnPinView"&gt;Toggle Sample Pins&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="nyc-map"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/section&gt;</p>
+<p class="p1">&lt;/main&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">// ============================================================================</p>
+<p class="p1">// EMBEDDED DATASET (Replace with full output from Python script below if desired)</p>
+<p class="p1">// Schema: [borough, created_ym, status, days_to_close, location_type, zip, lat, lng, address]</p>
+<p class="p1">// ============================================================================</p>
+<p class="p1">const RAW_DATA = [</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2010-01","Closed",14,"3+ Family Apt. Building","11216",40.6744,-73.9508,"781 PROSPECT PLACE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2010-06","Closed",11,"3+ Family Apt. Building","11221",40.6923,-73.9134,"196 CORNELIA STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2010-08","Closed",9,"1-2 Family Dwelling","11215",40.6702,-73.9815,"414 5 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2011-05","Closed",12,"3+ Family Apt. Building","11238",40.6733,-73.9616,"500 ST JOHN'S PLACE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2011-07","Closed",8,"Commercial Building","11211",40.7184,-73.9571,"NORTH 8 ST &amp; BEDFORD AVE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2011-10","Closed",10,"3+ Family Apt. Building","11203",40.6425,-73.9234,"5604 AVENUE D"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2012-04","Closed",13,"1-2 Family Dwelling","11221",40.6910,-73.9350,"300 VAN BUREN STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2012-07","Closed",7,"Vacant Lot","11237",40.7045,-73.9294,"1048 FLUSHING AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2012-09","Closed",15,"3+ Family Mixed Use Building","11236",40.6529,-73.9124,"652 EAST 96 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2013-06","Closed",6,"3+ Family Apt. Building","11216",40.6731,-73.9559,"681 STERLING PLACE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2013-08","Closed",9,"Public Garden","11235",40.5812,-73.9674,"2827 OCEAN PARKWAY"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2013-09","Closed",6,"3+ Family Apt. Building","11221",40.6923,-73.9134,"196 CORNELIA STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2014-05","Closed",11,"3+ Family Apt. Building","11217",40.6803,-73.9759,"45 ST MARK'S AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2014-08","Pending",null,"3+ Family Apt. Building","11217",40.6761,-73.9732,"208 ST JOHN'S PLACE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2015-07","Closed",5,"1-2 Family Dwelling","11216",40.6762,-73.9446,"112 BROOKLYN AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2015-08","Closed",8,"3+ Family Mixed Use Building","11237",40.6985,-73.9212,"1381 MYRTLE AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2016-06","Closed",5,"Construction Site","11238",40.6743,-73.9674,"314 ST JOHN'S PLACE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2016-09","Closed",7,"3+ Family Apt. Building","11213",40.6740,-73.9285,"1248 ST MARK'S AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2017-05","Closed",14,"Construction Site","11238",40.6734,-73.9629,"820 WASHINGTON AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2017-08","Pending",null,"3+ Family Mixed Use Building","11216",40.6717,-73.9525,"776 SAINT JOHN'S PLACE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2018-05","Closed",10,"1-2 Family Dwelling","11207",40.6867,-73.9082,"112 COOPER ST"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BROOKLYN","2018-06","Closed",8,"Vacant Building","11212",40.6651,-73.9245,"47 ROCKAWAY PARKWAY"],</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2010-01","Pending",null,"Commercial Building","10016",40.7432,-73.9770,"2 AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2010-07","Closed",12,"3+ Family Apt. Building","10027",40.8074,-73.9544,"317 WEST 120 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2011-06","Closed",9,"3+ Family Apt. Building","10025",40.7962,-73.9714,"251 WEST 98 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2011-10","Closed",14,"3+ Family Apt. Building","10036",40.7607,-73.9910,"651 9 AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2012-05","Closed",11,"3+ Family Apt. Building","10009",40.7214,-73.9801,"280 EAST 3 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2012-08","Closed",8,"Commercial Building","10012",40.7233,-73.9975,"90 CROSBY STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2013-07","Closed",10,"3+ Family Apt. Building","10002",40.7172,-73.9802,"71 COLUMBIA STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2013-09","Closed",9,"3+ Family Apt. Building","10029",40.7897,-73.9424,"311 EAST 105 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2014-06","Closed",7,"3+ Family Apt. Building","10024",40.7849,-73.9705,"14 WEST 85 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2014-09","Closed",13,"3+ Family Mixed Use Building","10003",40.7290,-73.9867,"309 EAST 9 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2015-07","Closed",4,"3+ Family Apt. Building","10030",40.8151,-73.9432,"179 WEST 135 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2015-08","Closed",6,"Construction Site","10037",40.8087,-73.9379,"53 EAST 130 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2016-07","Closed",8,"3+ Family Apt. Building","10025",40.7994,-73.9633,"101 WEST 106 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2017-06","Closed",9,"3+ Family Apt. Building","10024",40.7880,-73.9699,"52 WEST 89 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2017-08","Closed",9,"3+ Family Apt. Building","10009",40.7273,-73.9846,"111 SAINT MARK'S PLACE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["MANHATTAN","2018-06","Closed",7,"3+ Family Apt. Building","10025",40.7980,-73.9679,"202 WEST 102 STREET"],</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>["QUEENS","2010-01","Pending",null,"1-2 Family Dwelling","11365",40.7400,-73.8093,"59-13 159 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["QUEENS","2011-08","Closed",6,"Catch Basin/Sewer","11378",40.7232,-73.8910,"59-64 69 LANE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["QUEENS","2012-06","Closed",11,"3+ Family Apt. Building","11432",40.7082,-73.7916,"90-15 169 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["QUEENS","2013-09","Closed",6,"Other (Explain Below)","11434",40.6703,-73.7820,"134-35 154 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["QUEENS","2013-09","Closed",14,"1-2 Family Dwelling","11365",40.7380,-73.8057,"61-16 163 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["QUEENS","2014-07","Closed",12,"1-2 Family Dwelling","11361",40.7549,-73.7810,"200-27 46 AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["QUEENS","2015-07","Closed",5,"1-2 Family Dwelling","11354",40.7731,-73.8242,"144-30 28 AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["QUEENS","2016-08","Closed",9,"3+ Family Mixed Use Building","11106",40.7618,-73.9426,"36-01 VERNON BOULEVARD"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["QUEENS","2017-05","Closed",8,"3+ Family Apt. Building","11385",40.7083,-73.9188,"1737 WILLOUGHBY AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["QUEENS","2018-05","Closed",7,"3+ Family Apt. Building","11419",40.6870,-73.8140,"130-03 107 AVENUE"],</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BRONX","2010-01","Pending",null,"3+ Family Apt. Building","10467",40.8636,-73.8704,"2504 BRONX PARK EAST"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BRONX","2011-10","Closed",9,"3+ Family Apt. Building","10474",40.8110,-73.8865,"541 COSTER STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BRONX","2012-07","Closed",10,"3+ Family Apt. Building","10457",40.8468,-73.9072,"203 EAST 175 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BRONX","2013-09","Closed",5,"3+ Family Apt. Building","10451",40.8242,-73.9162,"320 EAST 160 STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BRONX","2013-09","Closed",10,"Single Room Occupancy (SRO)","10458",40.8523,-73.8844,"2308 CROTONA AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BRONX","2014-08","Closed",11,"3+ Family Apt. Building","10467",40.8723,-73.8661,"3230 CRUGER AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BRONX","2015-07","Closed",10,"3+ Family Apt. Building","10455",40.8183,-73.9035,"778 UNION AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BRONX","2016-08","Closed",8,"1-2 Family Dwelling","10473",40.8102,-73.8555,"232 SOUNDVIEW AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BRONX","2017-08","Closed",12,"Vacant Building","10456",40.8222,-73.9093,"844 SAINT ANN'S AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["BRONX","2018-06","Closed",6,"3+ Family Apt. Building","10456",40.8279,-73.9183,"949 GRANT AVENUE"],</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>["STATEN ISLAND","2010-01","Pending",null,"Commercial Building","10306",40.5748,-74.1159,"1375 NORTH RAILROAD AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["STATEN ISLAND","2011-10","Closed",6,"1-2 Family Dwelling","10312",40.5523,-74.1754,"430 ANNADALE ROAD"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["STATEN ISLAND","2012-08","Closed",9,"1-2 Family Dwelling","10310",40.6315,-74.1257,"722 POST AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["STATEN ISLAND","2013-09","Closed",18,"1-2 Family Dwelling","10303",40.6248,-74.1602,"394 WILCOX STREET"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["STATEN ISLAND","2014-07","Closed",11,"1-2 Family Dwelling","10308",40.5559,-74.1607,"439 LEVERETT AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["STATEN ISLAND","2015-08","Closed",8,"Vacant Building","10308",40.5538,-74.1402,"9 AINSWORTH AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["STATEN ISLAND","2016-06","Closed",10,"Parking Lot/Garage","10314",40.6121,-74.1371,"2212 VICTORY BOULEVARD"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["STATEN ISLAND","2017-07","Closed",9,"1-2 Family Dwelling","10306",40.5559,-74.1349,"104 JUSTIN AVENUE"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["STATEN ISLAND","2018-06","Assigned",null,"1-2 Family Dwelling","10314",40.6116,-74.1283,"CLERMONT PLACE"]</p>
+<p class="p1">];</p>
+<p class="p2"><br></p>
+<p class="p1">// ============================================================================</p>
+<p class="p1">// APP STATE &amp; CHARTS</p>
+<p class="p1">// ============================================================================</p>
+<p class="p1">let boroughBarChart, locationDonutChart, monthlyLineChart;</p>
+<p class="p1">let map, zipLayer, pinLayer, legendControl;</p>
+<p class="p1">let showSamplePins = false;</p>
+<p class="p2"><br></p>
+<p class="p1">// Tab Navigation</p>
+<p class="p1">document.querySelectorAll('.tab-btn').forEach(btn =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>btn.addEventListener('click', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.querySelectorAll('.tab-btn').forEach(b =&gt; b.classList.remove('active'));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.querySelectorAll('.tab-panel').forEach(p =&gt; p.classList.remove('active'));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>btn.classList.add('active');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const target = btn.dataset.tab;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById(target).classList.add('active');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (target === 'map' &amp;&amp; map) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setTimeout(() =&gt; map.invalidateSize(), 100);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p1">});</p>
+<p class="p2"><br></p>
+<p class="p1">document.getElementById('boroughFilter').addEventListener('change', updateDashboard);</p>
+<p class="p2"><br></p>
+<p class="p1">function getFilteredData() {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const b = document.getElementById('boroughFilter').value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return b === 'ALL' ? RAW_DATA : RAW_DATA.filter(r =&gt; r[0] === b);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// Linear Regression Helper</p>
+<p class="p1">function linearRegression(yVals) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const n = yVals.length;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>for (let i = 0; i &lt; n; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>sumX += i;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>sumY += yVals[i];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>sumXY += i * yVals[i];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>sumXX += i * i;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX || 1);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const intercept = (sumY - slope * sumX) / (n || 1);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return { slope, intercept };</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function updateSummary(filtered) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const total = filtered.length;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('kpi-total').textContent = total.toLocaleString();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Most affected borough</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const bCounts = {};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>filtered.forEach(r =&gt; { bCounts[r[0]] = (bCounts[r[0]] || 0) + 1; });</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const sortedB = Object.entries(bCounts).sort((a, b) =&gt; b[1] - a[1]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (sortedB.length) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const [topB, topC] = sortedB[0];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('kpi-top-borough').textContent = topB;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('kpi-top-borough-sub').textContent = `${topC.toLocaleString()} sightings (${((topC / total) * 100).toFixed(1)}%)`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('kpi-top-borough').textContent = 'N/A';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Closed percentage &amp; Avg days</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const closed = filtered.filter(r =&gt; r[2] === 'Closed');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const closedPct = total ? ((closed.length / total) * 100).toFixed(1) : 0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('kpi-closed-pct').textContent = `${closedPct}%`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('kpi-closed-sub').textContent = `${closed.length.toLocaleString()} of ${total.toLocaleString()} closed`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const validDays = closed.map(r =&gt; r[3]).filter(d =&gt; typeof d === 'number' &amp;&amp; !isNaN(d) &amp;&amp; d &gt;= 0);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const avgDays = validDays.length ? (validDays.reduce((a, b) =&gt; a + b, 0) / validDays.length).toFixed(1) : 'N/A';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('kpi-avg-days').textContent = validDays.length ? `${avgDays} days` : 'N/A';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Bar chart (always compares across the 5 boroughs, highlighting selected)</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const boroughs = ['BROOKLYN', 'MANHATTAN', 'QUEENS', 'BRONX', 'STATEN ISLAND'];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const allBCounts = boroughs.map(b =&gt; RAW_DATA.filter(r =&gt; r[0] === b).length);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const selectedB = document.getElementById('boroughFilter').value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const barColors = boroughs.map(b =&gt; (selectedB === 'ALL' || selectedB === b) ? '#58a6ff' : '#30363d');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (boroughBarChart) boroughBarChart.destroy();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>boroughBarChart = new Chart(document.getElementById('boroughBarChart'), {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>type: 'bar',</p>
+<p class="p1"><span class="Apple-converted-space">    </span>data: {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>labels: boroughs,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>datasets: [{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>label: 'Sightings',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>data: allBCounts,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>backgroundColor: barColors,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>borderRadius: 6</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}]</p>
+<p class="p1"><span class="Apple-converted-space">    </span>},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>options: {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>responsive: true,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>maintainAspectRatio: false,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>plugins: { legend: { display: false } },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>scales: {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>x: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' } },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>y: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' }, beginAtZero: true }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Location Donut Chart</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const locCounts = {};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>filtered.forEach(r =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const loc = r[4] || 'Unspecified';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>locCounts[loc] = (locCounts[loc] || 0) + 1;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const sortedLocs = Object.entries(locCounts).sort((a, b) =&gt; b[1] - a[1]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const topLocs = sortedLocs.slice(0, 6);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const otherSum = sortedLocs.slice(6).reduce((acc, cur) =&gt; acc + cur[1], 0);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (otherSum &gt; 0) topLocs.push(['Other Types', otherSum]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (locationDonutChart) locationDonutChart.destroy();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>locationDonutChart = new Chart(document.getElementById('locationDonutChart'), {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>type: 'doughnut',</p>
+<p class="p1"><span class="Apple-converted-space">    </span>data: {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>labels: topLocs.map(x =&gt; x[0]),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>datasets: [{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>data: topLocs.map(x =&gt; x[1]),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>backgroundColor: ['#58a6ff', '#3fb950', '#d29922', '#f85149', '#a371f7', '#39c5cf', '#8b949e'],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>borderColor: '#161b22',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>borderWidth: 2</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}]</p>
+<p class="p1"><span class="Apple-converted-space">    </span>},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>options: {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>responsive: true,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>maintainAspectRatio: false,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>plugins: {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>legend: { position: 'right', labels: { color: '#f0f6fc', boxWidth: 12 } }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function updateTrends(filtered) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const years = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Build month-by-month series (2010-01 to 2018-12)</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const ymMap = {};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>filtered.forEach(r =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (r[1]) ymMap[r[1]] = (ymMap[r[1]] || 0) + 1;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const labels = [];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const actuals = [];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>years.forEach(y =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for (let m = 1; m &lt;= 12; m++) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const ym = `${y}-${String(m).padStart(2, '0')}`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>labels.push(ym);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>actuals.push(ymMap[ym] || 0);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Trim trailing zero months in 2018 if dataset ends mid-year</p>
+<p class="p1"><span class="Apple-converted-space">  </span>while (actuals.length &gt; 12 &amp;&amp; actuals[actuals.length - 1] === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>actuals.pop();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>labels.pop();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const { slope, intercept } = linearRegression(actuals);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const direction = slope &gt;= 0 ? 'Upward ▲' : 'Downward ▼';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('trend-badge').textContent =</p>
+<p class="p1"><span class="Apple-converted-space">    </span>`Trend: ${direction} (${slope &gt;= 0 ? '+' : ''}${slope.toFixed(2)} sightings/month)`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Extend 12 months into forecast</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const forecastHorizon = 12;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const extendedLabels = [...labels];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const actualSeries = [...actuals];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const trendSeries = actuals.map((_, i) =&gt; Math.max(0, intercept + slope * i));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>let [lastY, lastM] = labels[labels.length - 1].split('-').map(Number);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>for (let f = 1; f &lt;= forecastHorizon; f++) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>lastM++;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (lastM &gt; 12) { lastM = 1; lastY++; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>extendedLabels.push(`${lastY}-${String(lastM).padStart(2, '0')} (F)`);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>actualSeries.push(null);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>trendSeries.push(Math.max(0, intercept + slope * (actuals.length - 1 + f)));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (monthlyLineChart) monthlyLineChart.destroy();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>monthlyLineChart = new Chart(document.getElementById('monthlyLineChart'), {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>type: 'line',</p>
+<p class="p1"><span class="Apple-converted-space">    </span>data: {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>labels: extendedLabels,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>datasets: [</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>label: 'Monthly Sightings',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>data: actualSeries,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>borderColor: '#58a6ff',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>backgroundColor: 'rgba(88, 166, 255, 0.15)',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>fill: true,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>tension: 0.25,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>pointRadius: 2</p>
+<p class="p1"><span class="Apple-converted-space">        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>label: 'Linear Regression &amp; 12-Mo Forecast',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>data: trendSeries,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>borderColor: '#f85149',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>borderDash: [6, 6],</p>
+<p class="p1"><span class="Apple-converted-space">          </span>borderWidth: 2,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>pointRadius: 0,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>fill: false</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>]</p>
+<p class="p1"><span class="Apple-converted-space">    </span>},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>options: {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>responsive: true,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>maintainAspectRatio: false,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>plugins: { legend: { labels: { color: '#f0f6fc' } } },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>scales: {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>x: { ticks: { color: '#8b949e', maxTicksLimit: 18 }, grid: { color: '#21262d' } },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>y: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' }, beginAtZero: true }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Seasonal Heatmap Table</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let maxCell = 1;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const grid = Array.from({ length: 12 }, () =&gt; Array(years.length).fill(0));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>filtered.forEach(r =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!r[1]) return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const [yStr, mStr] = r[1].split('-');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const yIdx = years.indexOf(Number(yStr));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const mIdx = Number(mStr) - 1;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (yIdx &gt;= 0 &amp;&amp; mIdx &gt;= 0 &amp;&amp; mIdx &lt; 12) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>grid[mIdx][yIdx]++;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (grid[mIdx][yIdx] &gt; maxCell) maxCell = grid[mIdx][yIdx];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>let html = '&lt;table class="heatmap"&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Month&lt;/th&gt;';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>years.forEach(y =&gt; { html += `&lt;th&gt;${y}&lt;/th&gt;`; });</p>
+<p class="p1"><span class="Apple-converted-space">  </span>html += '&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>for (let m = 0; m &lt; 12; m++) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>html += `&lt;tr&gt;&lt;td class="month-col"&gt;${fullMonths[m]}&lt;/td&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for (let y = 0; y &lt; years.length; y++) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const val = grid[m][y];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const intensity = val / maxCell;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const bg = val === 0</p>
+<p class="p1"><span class="Apple-converted-space">        </span>? 'rgba(33, 38, 45, 0.4)'</p>
+<p class="p1"><span class="Apple-converted-space">        </span>: `rgba(88, 166, 255, ${(0.15 + intensity * 0.8).toFixed(2)})`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const textColor = intensity &gt; 0.55 ? '#0d1117' : '#f0f6fc';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>html += `&lt;td style="background:${bg}; color:${textColor}; font-weight:${intensity &gt; 0.55 ? '700' : '400'};"&gt;${val}&lt;/td&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>html += '&lt;/tr&gt;';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>html += '&lt;/tbody&gt;&lt;/table&gt;';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('heatmapContainer').innerHTML = html;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function initMap() {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>map = L.map('nyc-map').setView([40.7128, -73.9560], 11);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>attribution: '&amp;copy; OpenStreetMap &amp;copy; CARTO',</p>
+<p class="p1"><span class="Apple-converted-space">    </span>maxZoom: 18</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}).addTo(map);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>zipLayer = L.layerGroup().addTo(map);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pinLayer = L.layerGroup();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>legendControl = L.control({ position: 'bottomright' });</p>
+<p class="p1"><span class="Apple-converted-space">  </span>legendControl.onAdd = function () {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const div = L.DomUtil.create('div', 'legend');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>div.id = 'map-legend';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return div;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>legendControl.addTo(map);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('btnZipView').addEventListener('click', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>showSamplePins = false;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('btnZipView').classList.add('active');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('btnPinView').classList.remove('active');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>updateMap(getFilteredData());</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('btnPinView').addEventListener('click', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>showSamplePins = !showSamplePins;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('btnPinView').classList.toggle('active', showSamplePins);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>updateMap(getFilteredData());</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function getZipColor(count, maxCount) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const ratio = count / (maxCount || 1);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (ratio &gt; 0.75) return '#08519c';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (ratio &gt; 0.50) return '#3182bd';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (ratio &gt; 0.25) return '#6baed6';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return '#bdd7e7';</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function updateMap(filtered) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (!map) initMap();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>zipLayer.clearLayers();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pinLayer.clearLayers();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Aggregate by Zip Code</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const zipAgg = {};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>filtered.forEach(r =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const zip = r[5], lat = r[6], lng = r[7];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!zip || !lat || !lng) return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!zipAgg[zip]) zipAgg[zip] = { count: 0, latSum: 0, lngSum: 0, borough: r[0] };</p>
+<p class="p1"><span class="Apple-converted-space">    </span>zipAgg[zip].count++;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>zipAgg[zip].latSum += lat;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>zipAgg[zip].lngSum += lng;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const zipEntries = Object.entries(zipAgg);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const maxZip = Math.max(1, ...zipEntries.map(z =&gt; z[1].count));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>zipEntries.forEach(([zip, info]) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const cLat = info.latSum / info.count;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const cLng = info.lngSum / info.count;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const color = getZipColor(info.count, maxZip);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const radius = 6 + (info.count / maxZip) * 16;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>L.circleMarker([cLat, cLng], {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>radius,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>fillColor: color,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: '#f0f6fc',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>weight: 1,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0.85,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>fillOpacity: 0.8</p>
+<p class="p1"><span class="Apple-converted-space">    </span>})</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.bindPopup(`&lt;strong&gt;ZIP: ${zip}&lt;/strong&gt; (${info.borough})&lt;br/&gt;Total Sightings: &lt;b&gt;${info.count}&lt;/b&gt;`)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.addTo(zipLayer);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Update Legend</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const q1 = Math.max(1, Math.round(maxZip * 0.25));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const q2 = Math.max(2, Math.round(maxZip * 0.50));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const q3 = Math.max(3, Math.round(maxZip * 0.75));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('map-legend').innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;strong&gt;Sightings per Zip Code&lt;/strong&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="legend-item"&gt;&lt;span class="legend-swatch" style="background:#bdd7e7"&gt;&lt;/span&gt; 1 – ${q1}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="legend-item"&gt;&lt;span class="legend-swatch" style="background:#6baed6"&gt;&lt;/span&gt; ${q1 + 1} – ${q2}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="legend-item"&gt;&lt;span class="legend-swatch" style="background:#3182bd"&gt;&lt;/span&gt; ${q2 + 1} – ${q3}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="legend-item"&gt;&lt;span class="legend-swatch" style="background:#08519c"&gt;&lt;/span&gt; ${q3 + 1}+ (Peak)&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Sample Pins Layer</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (showSamplePins) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const sample = filtered.filter(r =&gt; r[6] &amp;&amp; r[7]).slice(0, 300);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>sample.forEach(r =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>L.marker([r[6], r[7]])</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.bindPopup(`</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;strong&gt;${r[8] || 'Intersection / Blockface'}&lt;/strong&gt;&lt;br/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Borough: ${r[0]} (${r[5] || 'N/A'})&lt;br/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Date: ${r[1]} | Status: &lt;b&gt;${r[2]}&lt;/b&gt;&lt;br/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Location: ${r[4] || 'Unspecified'}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.addTo(pinLayer);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>pinLayer.addTo(map);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>map.removeLayer(pinLayer);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function updateDashboard() {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const filtered = getFilteredData();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>updateSummary(filtered);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>updateTrends(filtered);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>updateMap(filtered);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">updateDashboard();</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
